@@ -5,4 +5,4 @@ def run_producer(topic: str, message: bytes):
     producer = KafkaProducer(bootstrap_servers="localhost:9092")
     producer.send(topic, json.dumps(message).encode('utf-8'))
     producer.flush()
-    print(f"Sent: {message}")
+    print(f"Sent:msg")
