@@ -12,4 +12,5 @@ def run_consumer(topic="test_topic"):
 
     print("Consumer listening...")
     for msg in consumer:
-        print(f"Received: {msg.value.decode()}")
+            print(f"Message received at offset {msg.offset} on topic {msg.topic}")
+
