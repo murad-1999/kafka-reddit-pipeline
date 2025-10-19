@@ -3,7 +3,7 @@ from consumer import run_consumer
 import threading
 import time
 from fetch_data import fetch_reddit_data
-from db_utils import get_connection, insert_post, commit, close
+from db_utils import setup_database, get_connection, insert_post, commit, close
 
 
 def main():
@@ -30,12 +30,13 @@ def main():
     print(children_list[0].get('data', {})['id'])
 
 
+    setup_database(conn, cursor, "reddit_posts")
     for post_wrapper in children_list:
         # 2. Extract the actual post data dictionary from the 'data' key of the wrapper
         post_data = post_wrapper.get('data', {})
         
         # 3. Insert the clean dictionary
-        if insert_post(cursor, post_data):
+        if insert_post(cursor, post_data, "reddit_posts"):
             print(post_data['id'])
             successful_inserts += 1
 
