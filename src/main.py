@@ -7,21 +7,32 @@ from fetch_data import fetch_reddit_data
 
 def main():
     # Start consumer in background thread
-    consumer_thread = threading.Thread(target=run_consumer, daemon=False)
+    consumer_thread = threading.Thread(target=run_consumer, daemon=True)
     consumer_thread.start()
 
     time.sleep(2)  # give consumer a moment to connect
+    print("Starting periodic Reddit data fetching... (every 10s)")
 
-    data = fetch_reddit_data('astronomy', limit=4)
+    while True:
+        try:
 
-    # Send one message
-    run_producer("test_topic", data)
+            data = fetch_reddit_data('astronomy', limit=4)
 
-    consumer_thread.join()
+            # Send one message
+            run_producer("reddit_posts", data)
 
+            print(f"[{time.strftime('%H:%M:%S')}] Sent {len(data.get('data', {}).get('children', []))} posts to Kafka.")
 
-    # Keep alive so consumer can print
-    time.sleep(5)
-
+            # Keep alive so consumer can print
+            time.sleep(5)
+        except KeyboardInterrupt:
+            print("Stopping data fetch loop...")
+            break
+        except Exception as e:
+            print(f"Error during loop: {e}")
+            time.sleep(10)  # small backoff before retrying
+"""         finally:
+            consumer_thread.join()
+ """
 if __name__ == "__main__":
     main()
