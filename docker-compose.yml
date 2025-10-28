@@ -21,6 +21,21 @@ services:
     restart: unless-stopped
     networks:
     - monitoring
+
+  kafka-exporter:
+    image: bitnami/jmx-exporter:latest
+    container_name: kafka-exporter
+    environment:
+      - SERVICE_PORT=5556
+      - SERVICE_NAME=kafka
+      - SERVICE_JMX_URL=service:jmx:rmi:///jndi/rmi://broker:9999/jmxrmi
+    ports:
+      - "5556:5556"
+    depends_on:
+      - broker
+    networks:
+      - monitoring
+
   postgres:
     image: postgres:latest
     container_name: postgres
@@ -36,7 +51,7 @@ services:
     networks:
       - monitoring
 
-  postgres_exporter:
+  postgres-exporter:
     image: prometheuscommunity/postgres-exporter
     container_name: postgres_exporter
     environment:
